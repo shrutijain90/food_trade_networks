@@ -28,6 +28,7 @@ def get_area_codes():
     FAO_area_codes['Area Code (M49)'] = FAO_area_codes.apply(lambda row: int(row['Area Code (M49)'][1:]), axis=1)
     FAO_area_codes = FAO_area_codes.merge(area_codes)
     FAO_area_codes = FAO_area_codes[['Area Code (M49)', 'country', 'iso3']]
+    FAO_area_codes = FAO_area_codes.sort_values(by='iso3')
     
     return FAO_area_codes
 
@@ -180,12 +181,33 @@ def re_export_algo(P, E):
 
 if __name__ == '__main__':
     
-    # Enter item and year of interes here
-    item = 'Maize (corn)' # 
-    year = 2020 #or 2021?
+    # Enter crops and years
+    items = ['Wheat', 'Maize (corn)', 'Rye', 'Barley', 'Oats', 'Sorghum', 'Rice', 'Buckwheat', 'Millet', 'Quinoa', 'Cereals n.e.c.'] 
+    years = [2017, 2018, 2019, 2020, 2021]
     
     FAO_area_codes = get_area_codes()
-    P = get_prod_matrix(item, year, FAO_area_codes)
-    E = get_trade_matrix(item, year, FAO_area_codes)
     
+    # create empty matrix
+    cereals = np.zeros((len(FAO_area_codes), len(FAO_area_codes)))
     
+    for year in years:
+        print(year)
+        for item in items:
+            print(item)
+            P = get_prod_matrix(item, year, FAO_area_codes)
+            E = get_trade_matrix(item, year, FAO_area_codes)
+            D = re_export_algo(P, E)
+            df_D = pd.DataFrame(D, columns = FAO_area_codes['iso3'].values.tolist())
+            df_D['iso3'] = pd.Series(FAO_area_codes['iso3'].values.tolist(), index=df_D.index)
+            first_column = df_D.pop('iso3')
+            df_D.insert(0, 'iso3', first_column)
+            df_D.to_csv(f'{data_dir_prefix}FAO_re_export/supply_matrix_{item}_{year}.csv', index=False)
+
+            # add to existing matrix for cereals
+            cereals = np.add(cereals, D)
+
+        df_cereals = pd.DataFrame(cereals, columns = FAO_area_codes['iso3'].values.tolist())
+        df_cereals['iso3'] = pd.Series(FAO_area_codes['iso3'].values.tolist(), index=df_cereals.index)
+        first_column = df_cereals.pop('iso3')
+        df_cereals.insert(0, 'iso3', first_column)
+        df_cereals.to_csv(f'{data_dir_prefix}FAO_re_export/supply_matrix_cereals_all_{year}.csv', index=False)
