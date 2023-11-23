@@ -15,7 +15,7 @@ def get_area_codes():
     area_codes = area_codes[['Alpha-3 code', 'Numeric code']].rename(
         columns={'Alpha-3 code': 'iso3', 'Numeric code': 'Area Code (M49)'})
     
-    admin = gpd.read_file(f'{data_dir_prefix}admin_polygons.gpkg')
+    admin = gpd.read_file(f'{data_dir_prefix}admin_polygons.gpkg') # not working due to inconsistencies in environment, hence using the areas file in next line
     area_codes = area_codes.merge(admin[['iso3','country']].drop_duplicates(), how='outer', indicator=True)
     area_codes.loc[area_codes['iso3']=='TKL', '_merge'] = 'both' # because Tokelau is missing from admin areas but is present in FAO data
     area_codes = area_codes[area_codes['_merge']=='both'].reset_index(drop=True)
@@ -188,7 +188,9 @@ if __name__ == '__main__':
     FAO_area_codes = get_area_codes()
     
     # create empty matrix
-    cereals = np.zeros((len(FAO_area_codes), len(FAO_area_codes)))
+    cereals_P = np.zeros((len(FAO_area_codes),1))
+    cereals_E = np.zeros((len(FAO_area_codes), len(FAO_area_codes)))
+    cereals_D = np.zeros((len(FAO_area_codes), len(FAO_area_codes)))
     
     for year in years:
         print(year)
@@ -197,6 +199,19 @@ if __name__ == '__main__':
             P = get_prod_matrix(item, year, FAO_area_codes)
             E = get_trade_matrix(item, year, FAO_area_codes)
             D = re_export_algo(P, E)
+
+            df_P = pd.DataFrame(P, columns=['prod'])
+            df_P['iso3'] = pd.Series(FAO_area_codes['iso3'].values.tolist(), index=df_P.index)
+            first_column = df_P.pop('iso3')
+            df_P.insert(0, 'iso3', first_column)
+            df_P.to_csv(f'{data_dir_prefix}FAO_prod_mat/prod_matrix_{item}_{year}.csv', index=False)
+            
+            df_E = pd.DataFrame(E, columns = FAO_area_codes['iso3'].values.tolist())
+            df_E['iso3'] = pd.Series(FAO_area_codes['iso3'].values.tolist(), index=df_E.index)
+            first_column = df_E.pop('iso3')
+            df_E.insert(0, 'iso3', first_column)
+            df_E.to_csv(f'{data_dir_prefix}FAO_bal_trade_mat/trade_matrix_{item}_{year}.csv', index=False)
+            
             df_D = pd.DataFrame(D, columns = FAO_area_codes['iso3'].values.tolist())
             df_D['iso3'] = pd.Series(FAO_area_codes['iso3'].values.tolist(), index=df_D.index)
             first_column = df_D.pop('iso3')
@@ -204,10 +219,26 @@ if __name__ == '__main__':
             df_D.to_csv(f'{data_dir_prefix}FAO_re_export/supply_matrix_{item}_{year}.csv', index=False)
 
             # add to existing matrix for cereals
-            cereals = np.add(cereals, D)
+            cereals_P = np.add(cereals_P, P)
+            cereals_E = np.add(cereals_E, E)
+            cereals_D = np.add(cereals_D, D)
 
-        df_cereals = pd.DataFrame(cereals, columns = FAO_area_codes['iso3'].values.tolist())
-        df_cereals['iso3'] = pd.Series(FAO_area_codes['iso3'].values.tolist(), index=df_cereals.index)
-        first_column = df_cereals.pop('iso3')
-        df_cereals.insert(0, 'iso3', first_column)
-        df_cereals.to_csv(f'{data_dir_prefix}FAO_re_export/supply_matrix_cereals_all_{year}.csv', index=False)
+        df_cereals_P = pd.DataFrame(cereals_P, columns=['prod'])
+        df_cereals_P['iso3'] = pd.Series(FAO_area_codes['iso3'].values.tolist(), index=df_cereals_P.index)
+        first_column = df_cereals_P.pop('iso3')
+        df_cereals_P.insert(0, 'iso3', first_column)
+        df_cereals_P.to_csv(f'{data_dir_prefix}FAO_prod_mat/prod_matrix_cereals_all_{year}.csv', index=False)
+        
+        df_cereals_E = pd.DataFrame(cereals_E, columns = FAO_area_codes['iso3'].values.tolist())
+        df_cereals_E['iso3'] = pd.Series(FAO_area_codes['iso3'].values.tolist(), index=df_cereals_E.index)
+        first_column = df_cereals_E.pop('iso3')
+        df_cereals_E.insert(0, 'iso3', first_column)
+        df_cereals_E.to_csv(f'{data_dir_prefix}FAO_bal_trade_mat/trade_matrix_cereals_all_{year}.csv', index=False)
+        
+        df_cereals_D = pd.DataFrame(cereals_D, columns = FAO_area_codes['iso3'].values.tolist())
+        df_cereals_D['iso3'] = pd.Series(FAO_area_codes['iso3'].values.tolist(), index=df_cereals_D.index)
+        first_column = df_cereals_D.pop('iso3')
+        df_cereals_D.insert(0, 'iso3', first_column)
+        df_cereals_D.to_csv(f'{data_dir_prefix}FAO_re_export/supply_matrix_cereals_all_{year}.csv', index=False)
+
+

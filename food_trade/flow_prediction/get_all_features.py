@@ -8,11 +8,31 @@ import numpy as np
 def get_trade_data():
 
     # re-exported trade matrix (203 x 203)
-    trade_2017 = pd.read_csv("../../data/FAO_re_export/supply_matrix_cereals_all_2017.csv")
-    trade_2018 = pd.read_csv("../../data/FAO_re_export/supply_matrix_cereals_all_2018.csv")
-    trade_2019 = pd.read_csv("../../data/FAO_re_export/supply_matrix_cereals_all_2019.csv")
-    trade_2020 = pd.read_csv("../../data/FAO_re_export/supply_matrix_cereals_all_2020.csv")
-    trade_2021 = pd.read_csv("../../data/FAO_re_export/supply_matrix_cereals_all_2021.csv")
+    # trade_2017 = pd.read_csv("../../data/FAO_re_export/supply_matrix_cereals_all_2017.csv")
+    trade_2017 = pd.read_csv("../../data/FAO_re_export/supply_matrix_Maize (corn)_2017.csv")
+    # trade_2017 = pd.read_csv("../../data/FAO_bal_trade_mat/trade_matrix_cereals_all_2017.csv")
+    # trade_2017 = pd.read_csv("../../data/FAO_bal_trade_mat/trade_matrix_Maize (corn)_2017.csv")
+    
+    # trade_2018 = pd.read_csv("../../data/FAO_re_export/supply_matrix_cereals_all_2018.csv")
+    trade_2018 = pd.read_csv("../../data/FAO_re_export/supply_matrix_Maize (corn)_2018.csv")
+    # trade_2018 = pd.read_csv("../../data/FAO_bal_trade_mat/trade_matrix_cereals_all_2018.csv")
+    # trade_2018 = pd.read_csv("../../data/FAO_bal_trade_mat/trade_matrix_Maize (corn)_2018.csv")
+    
+    # trade_2019 = pd.read_csv("../../data/FAO_re_export/supply_matrix_cereals_all_2019.csv")
+    trade_2019 = pd.read_csv("../../data/FAO_re_export/supply_matrix_Maize (corn)_2019.csv")
+    # trade_2019 = pd.read_csv("../../data/FAO_bal_trade_mat/trade_matrix_cereals_all_2019.csv")
+    # trade_2019 = pd.read_csv("../../data/FAO_bal_trade_mat/trade_matrix_Maize (corn)_2019.csv")
+    
+    # trade_2020 = pd.read_csv("../../data/FAO_re_export/supply_matrix_cereals_all_2020.csv")
+    trade_2020 = pd.read_csv("../../data/FAO_re_export/supply_matrix_Maize (corn)_2020.csv")
+    # trade_2020 = pd.read_csv("../../data/FAO_bal_trade_mat/trade_matrix_cereals_all_2020.csv")
+    # trade_2020 = pd.read_csv("../../data/FAO_bal_trade_mat/trade_matrix_Maize (corn)_2020.csv")
+    
+    # trade_2021 = pd.read_csv("../../data/FAO_re_export/supply_matrix_cereals_all_2021.csv")
+    trade_2021 = pd.read_csv("../../data/FAO_re_export/supply_matrix_Maize (corn)_2021.csv")
+    # trade_2021 = pd.read_csv("../../data/FAO_bal_trade_mat/trade_matrix_cereals_all_2021.csv")
+    # trade_2021 = pd.read_csv("../../data/FAO_bal_trade_mat/trade_matrix_Maize (corn)_2021.csv")
+    
     trade = pd.concat([trade_2017, trade_2018, trade_2019, trade_2020, trade_2021]).groupby('iso3').mean().reset_index()
     
     # production, consumption, trade [203 FAO countries]
@@ -69,6 +89,12 @@ def get_admin_reductions():
     
     # population
     pop_admin, pop_country = _clean_cols('../../data/admin_reductions/pop_totals.csv')
+
+    # ghsl
+    area_admin, area_country = _clean_cols('../../data/admin_reductions/area_total.csv')
+    built_surface_admin, built_surface_country = _clean_cols('../../data/admin_reductions/built_surface.csv')
+    built_volume_total_admin, built_volume_total_country = _clean_cols('../../data/admin_reductions/built_volume_total.csv')
+    built_volume_nres_admin, built_volume_nres_country = _clean_cols('../../data/admin_reductions/built_volume_nres.csv')
     
     # combine all
     reductions_admin = barley_a_admin.merge(maize_a_admin, how='left').merge(millet_a_admin, how='left').merge(rice_a_admin, how='left').merge(
@@ -76,7 +102,9 @@ def get_admin_reductions():
         barley_p_admin, how='left').merge(maize_p_admin, how='left').merge(millet_p_admin, how='left').merge(rice_p_admin, how='left').merge(
         sorghum_p_admin, how='left').merge(wheat_p_admin, how='left').merge(other_p_admin, how='left').merge(
         buffaloes_admin, how='left').merge(cattle_admin, how='left').merge(chickens_admin, how='left').merge(ducks_admin, how='left').merge(
-        goats_admin, how='left').merge(horses_admin, how='left').merge(pigs_admin, how='left').merge(sheep_admin, how='left').merge(pop_admin, how='left')
+        goats_admin, how='left').merge(horses_admin, how='left').merge(pigs_admin, how='left').merge(sheep_admin, how='left').merge(
+        pop_admin, how='left').merge(area_admin, how='left').merge(built_surface_admin, how='left').merge(built_volume_total_admin, how='left').merge(
+        built_volume_nres_admin, how='left')
 
     reductions_country = barley_a_country.merge(maize_a_country, how='left').merge(millet_a_country, how='left').merge(rice_a_country, how='left').merge(
         sorghum_a_country, how='left').merge(wheat_a_country, how='left').merge(other_a_country, how='left').merge(
@@ -84,7 +112,8 @@ def get_admin_reductions():
         sorghum_p_country, how='left').merge(wheat_p_country, how='left').merge(other_p_country, how='left').merge(
         buffaloes_country, how='left').merge(cattle_country, how='left').merge(chickens_country, how='left').merge(ducks_country, how='left').merge(
         goats_country, how='left').merge(horses_country, how='left').merge(pigs_country, how='left').merge(sheep_country, how='left').merge(
-        pop_country, how='left')
+        pop_country, how='left').merge(area_country, how='left').merge(built_surface_country, how='left').merge(built_volume_total_country, how='left').merge(
+        built_volume_nres_country, how='left')
 
     return  reductions_admin, reductions_country
 
@@ -154,7 +183,7 @@ def get_transport_data(reductions_admin):
     return transport_admin, transport_country
 
 # merge data to get master dataframe
-def merge_data(log_x=True, log_y=True, trade_thresh=10):
+def merge_data(log_x=True, log_y=True, trade_thresh=10, get_trade_only=False):
     # trade data, replacing values less than 10 with zero
     trade = get_trade_data()
     trade.loc[trade['trade']<trade_thresh, 'trade'] = 0
@@ -164,6 +193,9 @@ def merge_data(log_x=True, log_y=True, trade_thresh=10):
     if log_y:
         trade.loc[trade['trade_exists']==1, 'trade'] = trade[trade['trade_exists']==1].apply(lambda row: np.log(row['trade']), axis=1)
     print('trade data done')
+
+    if get_trade_only:
+        return trade
     
     # x variables (admin reductions and transport)
     reductions_admin, reductions_country = get_admin_reductions()
@@ -180,7 +212,8 @@ def merge_data(log_x=True, log_y=True, trade_thresh=10):
 
         for col in ['barley_areas', 'maize_areas', 'millet_areas', 'rice_areas', 'sorghum_areas', 'wheat_areas', 'other_cereals_areas', 
                     'barley_production', 'maize_production', 'millet_production', 'rice_production', 'sorghum_production', 'wheat_production', 'other_cereals_production', 
-                    'buffaloes_totals', 'cattle_totals', 'chickens_totals', 'ducks_totals', 'goats_totals', 'horses_totals', 'pigs_totals', 'sheep_totals', 'pop_totals']:
+                    'buffaloes_totals', 'cattle_totals', 'chickens_totals', 'ducks_totals', 'goats_totals', 'horses_totals', 'pigs_totals', 'sheep_totals', 'pop_totals',
+                    'area_total', 'built_surface', 'built_volume_total', 'built_volume_nres']:
             print(f'log {col}')
             reductions_admin[col] = reductions_admin.apply(lambda row: np.log(row[col]+1), axis=1)
             reductions_country[col] = reductions_country.apply(lambda row: np.log(row[col]+1), axis=1)
@@ -223,7 +256,11 @@ def merge_data(log_x=True, log_y=True, trade_thresh=10):
         'horses_totals': 'from_horses', 
         'pigs_totals': 'from_pigs',
         'sheep_totals': 'from_sheep', 
-        'pop_totals': 'from_pop'})
+        'pop_totals': 'from_pop',
+        'area_total': 'from_area', 
+        'built_surface': 'from_built_surface', 
+        'built_volume_total': 'from_built_volume_total', 
+        'built_volume_nres': 'from_built_volume_nres'})
     
     df_country = df_country.merge(reductions_country, left_on='to_iso3', right_on='iso3').drop(['iso3'], axis=1).rename(columns={
         'barley_areas': 'to_barley_area', 
@@ -248,7 +285,11 @@ def merge_data(log_x=True, log_y=True, trade_thresh=10):
         'horses_totals': 'to_horses', 
         'pigs_totals': 'to_pigs',
         'sheep_totals': 'to_sheep', 
-        'pop_totals': 'to_pop'})
+        'pop_totals': 'to_pop',
+        'area_total': 'to_area', 
+        'built_surface': 'to_built_surface', 
+        'built_volume_total': 'to_built_volume_total', 
+        'built_volume_nres': 'to_built_volume_nres'})
     # remove these 5 area codes ('GLP', 'GUF', 'MTQ', 'REU', 'TUV') from data
     # [wouldn't make a difference, since they all have 0 production and consumption]
     df_country = df_country[(~df_country['from_iso3'].isin(['GLP', 'GUF', 'MTQ', 'REU', 'TUV'])) 
@@ -282,7 +323,11 @@ def merge_data(log_x=True, log_y=True, trade_thresh=10):
         'horses_totals': 'from_horses', 
         'pigs_totals': 'from_pigs',
         'sheep_totals': 'from_sheep', 
-        'pop_totals': 'from_pop'})
+        'pop_totals': 'from_pop',
+        'area_total': 'from_area', 
+        'built_surface': 'from_built_surface', 
+        'built_volume_total': 'from_built_volume_total', 
+        'built_volume_nres': 'from_built_volume_nres'})
     
     df_admin = df_admin.merge(reductions_admin, left_on='to_id', right_on='ID').drop(['ID', 'iso3'], axis=1).rename(columns={
         'barley_areas': 'to_barley_area', 
@@ -307,7 +352,11 @@ def merge_data(log_x=True, log_y=True, trade_thresh=10):
         'horses_totals': 'to_horses', 
         'pigs_totals': 'to_pigs',
         'sheep_totals': 'to_sheep', 
-        'pop_totals': 'to_pop'})
+        'pop_totals': 'to_pop',
+        'area_total': 'to_area', 
+        'built_surface': 'to_built_surface', 
+        'built_volume_total': 'to_built_volume_total', 
+        'built_volume_nres': 'to_built_volume_nres'})
 
     df_admin = df_admin[(df_admin['from_iso3'].isin(iso3_codes)) & (df_admin['to_iso3'].isin(iso3_codes))].reset_index(drop=True)
     print('df_admin done')
@@ -315,11 +364,54 @@ def merge_data(log_x=True, log_y=True, trade_thresh=10):
     return df_country, df_admin
 
 if __name__ == '__main__':
+    
+    # # thresh 0.001
+    # df_country, df_admin = merge_data(log_x=False, log_y=False, trade_thresh=0.001)
+    # df_country.to_parquet('../../data/combined_features/using_supply_mat/df_country_log_false_thresh_pt001.parquet.gzip', index=False, compression='gzip')
+    # df_admin.to_parquet('../../data/combined_features/df_admin_log_false.parquet.gzip', index=False, compression='gzip')
+    
+    # df_country, df_admin = merge_data(log_x=True, log_y=True, trade_thresh=0.001)
+    # df_country.to_parquet('../../data/combined_features/using_supply_mat/df_country_log_true_thresh_pt001.parquet.gzip', index=False, compression='gzip')
+    # df_admin.to_parquet('../../data/combined_features/df_admin_log_true.parquet.gzip', index=False, compression='gzip')
+    
+    # # thresh 1
+    # df_country_trade = merge_data(log_x=False, log_y=False, trade_thresh=1, get_trade_only=True)
+    # df_country_feat = pd.read_parquet('../../data/combined_features/using_supply_mat/df_country_log_false_thresh_pt001.parquet.gzip').drop(
+    #     ['trade_exists', 'trade'], axis=1)
+    # df_country = df_country_feat.merge(df_country_trade)
+    # df_country.to_parquet('../../data/combined_features/using_supply_mat/df_country_log_false_thresh_1.parquet.gzip', index=False, compression='gzip')
+    
+    # df_country_trade = merge_data(log_x=True, log_y=True, trade_thresh=1, get_trade_only=True)
+    # df_country_feat = pd.read_parquet('../../data/combined_features/using_supply_mat/df_country_log_true_thresh_pt001.parquet.gzip').drop(
+    #     ['trade_exists', 'trade'], axis=1)
+    # df_country = df_country_feat.merge(df_country_trade)
+    # df_country.to_parquet('../../data/combined_features/using_supply_mat/df_country_log_true_thresh_1.parquet.gzip', index=False, compression='gzip')
 
-    df_country, df_admin = merge_data(log_x=False, log_y=False, trade_thresh=0.001)
-    df_country.to_parquet('../../data/combined_features/df_country_log_false_thresh_pt001.parquet.gzip', index=False, compression='gzip')
-    df_admin.to_parquet('../../data/combined_features/df_admin_log_false.parquet.gzip', index=False, compression='gzip')
-    df_country, df_admin = merge_data(log_x=True, log_y=True, trade_thresh=0.001)
-    df_country.to_parquet('../../data/combined_features/df_country_log_true_thresh_pt001.parquet.gzip', index=False, compression='gzip')
-    df_admin.to_parquet('../../data/combined_features/df_admin_log_true.parquet.gzip', index=False, compression='gzip')
+    # # thresh 10
+    # df_country_trade = merge_data(log_x=False, log_y=False, trade_thresh=10, get_trade_only=True)
+    # df_country_feat = pd.read_parquet('../../data/combined_features/using_supply_mat/df_country_log_false_thresh_pt001.parquet.gzip').drop(
+    #     ['trade_exists', 'trade'], axis=1)
+    # df_country = df_country_feat.merge(df_country_trade)
+    # df_country.to_parquet('../../data/combined_features/using_supply_mat/df_country_log_false_thresh_10.parquet.gzip', index=False, compression='gzip')
+    
+    # df_country_trade = merge_data(log_x=True, log_y=True, trade_thresh=10, get_trade_only=True)
+    # df_country_feat = pd.read_parquet('../../data/combined_features/using_supply_mat/df_country_log_true_thresh_pt001.parquet.gzip').drop(
+    #     ['trade_exists', 'trade'], axis=1)
+    # df_country = df_country_feat.merge(df_country_trade)
+    # df_country.to_parquet('../../data/combined_features/using_supply_mat/df_country_log_true_thresh_10.parquet.gzip', index=False, compression='gzip')
+    
 
+    for thresh in [0.001, 1, 10]:
+        if thresh==0.001:
+            strng = 'pt001'
+        else:
+            strng = str(thresh)
+        for lg in [False, True]:
+            df_country_trade = merge_data(log_x=lg, log_y=lg, trade_thresh=thresh, get_trade_only=True)
+            df_country_feat = pd.read_parquet(
+                f'../../data/combined_features/using_supply_mat/df_country_log_{str(lg).lower()}_thresh_pt001.parquet.gzip').drop(
+                ['trade_exists', 'trade'], axis=1)
+            df_country = df_country_feat.merge(df_country_trade)
+            fname = f'../../data/combined_features/maize_using_supply_mat/df_country_log_{str(lg).lower()}_thresh_{strng}.parquet.gzip'
+            df_country.to_parquet(fname, index=False, compression='gzip')
+            
