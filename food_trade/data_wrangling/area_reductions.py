@@ -61,14 +61,14 @@ if __name__ == '__main__':
     coffee_r_area_spam = ee.Image("users/shruti_jain90/food/mapspam_2010/spam2010V2r0_global_H_RCOF_A")
     
     # livestock
-    buffaloes = ee.Image("users/shruti_jain90/food/livestock_2010/5_Bf_2010_Da")
-    cattle = ee.Image("users/shruti_jain90/food/livestock_2010/5_Ct_2010_Da")
-    chickens = ee.Image("users/shruti_jain90/food/livestock_2010/5_Ch_2010_Da")
-    ducks = ee.Image("users/shruti_jain90/food/livestock_2010/5_Dk_2010_Da")
-    goats = ee.Image("users/shruti_jain90/food/livestock_2010/5_Gt_2010_Da")
-    horses = ee.Image("users/shruti_jain90/food/livestock_2010/5_Ho_2010_Da")
-    pigs = ee.Image("users/shruti_jain90/food/livestock_2010/5_Pg_2010_Da")
-    sheep = ee.Image("users/shruti_jain90/food/livestock_2010/5_Sh_2010_Da")
+    buffaloes = ee.Image("users/shruti_jain90/food/livestock_2015/5_Bf_2015_Da")
+    cattle = ee.Image("users/shruti_jain90/food/livestock_2015/5_Ct_2015_Da")
+    chickens = ee.Image("users/shruti_jain90/food/livestock_2015/5_Ch_2015_Da")
+    ducks = ee.Image("users/shruti_jain90/food/livestock_2015/5_Dk_2015_Da")
+    goats = ee.Image("users/shruti_jain90/food/livestock_2015/5_Gt_2015_Da")
+    horses = ee.Image("users/shruti_jain90/food/livestock_2015/5_Ho_2015_Da")
+    pigs = ee.Image("users/shruti_jain90/food/livestock_2015/5_Pg_2015_Da")
+    sheep = ee.Image("users/shruti_jain90/food/livestock_2015/5_Sh_2015_Da")
     
     # pop indices
     pop = ee.Image("users/shruti_jain90/ppp_2020_1km_Aggregated")
@@ -76,6 +76,9 @@ if __name__ == '__main__':
     # ghsl variables
     ghsl_v = ee.ImageCollection("JRC/GHSL/P2023A/GHS_BUILT_V").filter(ee.Filter.eq('system:index','2020')).first()
     ghsl_s = ee.ImageCollection("JRC/GHSL/P2023A/GHS_BUILT_S").filter(ee.Filter.eq('system:index','2020')).first()
+
+    # gdp
+    gdp = ee.Image("users/shruti_jain90/GDP2005_1km")
     
     # gaez area units : 1000 ha
     # gaez production units: 1000 T
@@ -137,7 +140,7 @@ if __name__ == '__main__':
     # other_cereals_area_red = admin.map(lambda feature: reduce_region(other_cereals_area_gaez, feature))
     # export_features(other_cereals_area_red, 'other_cereals_areas')
     
-    # ## production
+    # # production
     
     # # barley
     # barley_production_gaez = barley_production_gaez.multiply(1000)
@@ -174,7 +177,7 @@ if __name__ == '__main__':
     # other_cereals_production_red = admin.map(lambda feature: reduce_region(other_cereals_production_gaez, feature))
     # export_features(other_cereals_production_red, 'other_cereals_production')
 
-    # ## counts
+    # # counts
     # # buffaloes
     # buffaloes_red = admin.map(lambda feature: reduce_region(buffaloes, feature))
     # export_features(buffaloes_red, 'buffaloes_totals')
@@ -210,8 +213,12 @@ if __name__ == '__main__':
     # # population
     # pop_red = admin.map(lambda feature: reduce_region(pop, feature))
     # export_features(pop_red, 'pop_totals')
+
+    # # # gdp
+    # gdp_red = admin.map(lambda feature: reduce_region(gdp, feature))
+    # export_features(gdp_red, 'gdp_totals')
     
-    ## ghsl
+    # ghsl
     # volume_total
     ghsl_v = ghsl_v.reproject(crs='EPSG:4326', scale=ghsl_v.projection().nominalScale())
     ghsl_v_red = admin.map(lambda feature: reduce_region(
@@ -220,20 +227,20 @@ if __name__ == '__main__':
     ))
     export_features(ghsl_v_red, 'built_volume_total')
 
-    # volume_nres
-    ghsl_v_red = admin.map(lambda feature: reduce_region(
-        ee.Image(ghsl_v.select('built_volume_nres').updateMask(ghsl_v.select('built_volume_nres').gt(0))).select(['built_volume_nres'], ['b1']), 
-        feature
-    ))
-    export_features(ghsl_v_red, 'built_volume_nres')
+    # # volume_nres
+    # ghsl_v_red = admin.map(lambda feature: reduce_region(
+    #     ee.Image(ghsl_v.select('built_volume_nres').updateMask(ghsl_v.select('built_volume_nres').gt(0))).select(['built_volume_nres'], ['b1']), 
+    #     feature
+    # ))
+    # export_features(ghsl_v_red, 'built_volume_nres')
 
-    # surface area
-    ghsl_s = ghsl_s.reproject(crs='EPSG:4326', scale=ghsl_s.projection().nominalScale())
-    ghsl_s_red = admin.map(lambda feature: reduce_region(
-        ee.Image(ghsl_s.updateMask(ghsl_s.gt(0))).select(['built_surface'], ['b1']), 
-        feature
-    ))
-    export_features(ghsl_s_red, 'built_surface')
+    # # surface area
+    # ghsl_s = ghsl_s.reproject(crs='EPSG:4326', scale=ghsl_s.projection().nominalScale())
+    # ghsl_s_red = admin.map(lambda feature: reduce_region(
+    #     ee.Image(ghsl_s.updateMask(ghsl_s.gt(0))).select(['built_surface'], ['b1']), 
+    #     feature
+    # ))
+    # export_features(ghsl_s_red, 'built_surface')
 
     # # total area
     # area = admin.map(lambda feature: feature.set('b1', feature.area()))

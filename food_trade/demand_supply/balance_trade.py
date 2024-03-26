@@ -55,10 +55,20 @@ def get_trade_matrix(item, year, FAO_area_codes):
     # preparing trade matrix
     mat = pd.read_csv(f'{data_dir_prefix}FAOSTAT_T-Z_E/Trade_DetailedTradeMatrix_E_All_Data_(Normalized)/Trade_DetailedTradeMatrix_E_All_Data_(Normalized).csv',
                       encoding='latin1')
-    mat = mat[(mat['Year']==year) & (mat['Item']==item) & (mat['Unit']=='tonnes')][['Reporter Country Code (M49)', 'Partner Country Code (M49)',
-                                                                                    'Reporter Countries', 'Partner Countries', 'Item', 'Element', 
-                                                                                    'Year', 'Unit', 'Value']].reset_index(drop=True)
-    
+
+    if item=='Oats':
+        mat = mat[(mat['Year']==year) & (mat['Item'].isin(['Oats', 'Oats, rolled'])) 
+                & (mat['Unit']=='tonnes')][['Reporter Country Code (M49)', 'Partner Country Code (M49)',
+                                            'Reporter Countries', 'Partner Countries', 'Item', 'Element', 
+                                            'Year', 'Unit', 'Value']].reset_index(drop=True)
+        mat = mat.groupby(['Reporter Country Code (M49)', 'Partner Country Code (M49)',
+                           'Reporter Countries', 'Partner Countries', 'Element', 'Year', 'Unit'])[['Value']].sum().reset_index()
+        mat['Item'] = 'Oats'
+    else:
+        mat = mat[(mat['Year']==year) & (mat['Item']==item) & (mat['Unit']=='tonnes')][['Reporter Country Code (M49)', 'Partner Country Code (M49)',
+                                                                                        'Reporter Countries', 'Partner Countries', 'Item', 'Element', 
+                                                                                        'Year', 'Unit', 'Value']].reset_index(drop=True)
+        
     # reliability index from "Reconciling bilateral trade data for use in GTAP"
     # accuracy level for each import 
     imports = mat[mat['Element']=='Import Quantity']
@@ -135,7 +145,7 @@ def re_export_algo(P, E):
     # Implements the trade matrix re-export algorithm as given in Croft et al., 2018 (https://www.sciencedirect.com/science/article/pii/S0959652618326180#appsec2)
     
     # Number of iterations
-    N = 10000
+    N = 100000 
 
     # Number of countries
     num_ctry = len(P)
@@ -182,21 +192,29 @@ def re_export_algo(P, E):
 if __name__ == '__main__':
     
     # Enter crops and years
-    items = ['Wheat', 'Maize (corn)', 'Rye', 'Barley', 'Oats', 'Sorghum', 'Rice', 'Buckwheat', 'Millet', 'Quinoa', 'Cereals n.e.c.'] 
+    # items = ['Wheat', 'Maize (corn)', 'Rye', 'Barley', 'Oats', 'Sorghum', 'Rice', 'Buckwheat', 'Millet', 'Quinoa', 'Cereals n.e.c.'] 
+    items = ['Wheat', 'Maize (corn)', 'Rye', 'Barley', 'Oats', 'Sorghum', 
+             'Rice, paddy (rice milled equivalent)', 'Buckwheat', 
+             'Millet', 'Quinoa', 'Cereals n.e.c.']
     years = [2017, 2018, 2019, 2020, 2021]
     
     FAO_area_codes = get_area_codes()
     
-    # create empty matrix
-    cereals_P = np.zeros((len(FAO_area_codes),1))
-    cereals_E = np.zeros((len(FAO_area_codes), len(FAO_area_codes)))
-    cereals_D = np.zeros((len(FAO_area_codes), len(FAO_area_codes)))
-    
     for year in years:
         print(year)
+        
+        # create empty matrix
+        cereals_P = np.zeros((len(FAO_area_codes),1))
+        cereals_E = np.zeros((len(FAO_area_codes), len(FAO_area_codes)))
+        cereals_D = np.zeros((len(FAO_area_codes), len(FAO_area_codes)))
+        
         for item in items:
             print(item)
-            P = get_prod_matrix(item, year, FAO_area_codes)
+            if item=='Rice, paddy (rice milled equivalent)':
+                P = get_prod_matrix('Rice', year, FAO_area_codes)
+                P = P * 0.7 # scaling down to account for milling
+            else:
+                P = get_prod_matrix(item, year, FAO_area_codes)
             E = get_trade_matrix(item, year, FAO_area_codes)
             D = re_export_algo(P, E)
 
