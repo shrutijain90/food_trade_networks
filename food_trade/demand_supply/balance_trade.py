@@ -15,7 +15,7 @@ def get_area_codes():
     area_codes = area_codes[['Alpha-3 code', 'Numeric code']].rename(
         columns={'Alpha-3 code': 'iso3', 'Numeric code': 'Area Code (M49)'})
     
-    admin = gpd.read_file(f'{data_dir_prefix}admin_polygons.gpkg') # not working due to inconsistencies in environment, hence using the areas file in next line
+    admin = gpd.read_file(f'{data_dir_prefix}admin_polygons.gpkg') 
     area_codes = area_codes.merge(admin[['iso3','country']].drop_duplicates(), how='outer', indicator=True)
     area_codes.loc[area_codes['iso3']=='TKL', '_merge'] = 'both' # because Tokelau is missing from admin areas but is present in FAO data
     area_codes = area_codes[area_codes['_merge']=='both'].reset_index(drop=True)
@@ -58,16 +58,20 @@ def get_trade_matrix(item, year, FAO_area_codes):
 
     if item=='Oats':
         mat = mat[(mat['Year']==year) & (mat['Item'].isin(['Oats', 'Oats, rolled'])) 
-                & (mat['Unit']=='tonnes')][['Reporter Country Code (M49)', 'Partner Country Code (M49)',
+                & (mat['Unit']=='t')][['Reporter Country Code (M49)', 'Partner Country Code (M49)',
                                             'Reporter Countries', 'Partner Countries', 'Item', 'Element', 
                                             'Year', 'Unit', 'Value']].reset_index(drop=True)
         mat = mat.groupby(['Reporter Country Code (M49)', 'Partner Country Code (M49)',
                            'Reporter Countries', 'Partner Countries', 'Element', 'Year', 'Unit'])[['Value']].sum().reset_index()
         mat['Item'] = 'Oats'
     else:
-        mat = mat[(mat['Year']==year) & (mat['Item']==item) & (mat['Unit']=='tonnes')][['Reporter Country Code (M49)', 'Partner Country Code (M49)',
+        mat = mat[(mat['Year']==year) & (mat['Item']==item) & (mat['Unit']=='t')][['Reporter Country Code (M49)', 'Partner Country Code (M49)',
                                                                                         'Reporter Countries', 'Partner Countries', 'Item', 'Element', 
                                                                                         'Year', 'Unit', 'Value']].reset_index(drop=True)
+
+    if len(mat)==0:
+        E = np.zeros((FAO_area_codes['iso3'].nunique(), FAO_area_codes['iso3'].nunique()))
+        return E
         
     # reliability index from "Reconciling bilateral trade data for use in GTAP"
     # accuracy level for each import 
@@ -192,11 +196,14 @@ def re_export_algo(P, E):
 if __name__ == '__main__':
     
     # Enter crops and years
-    # items = ['Wheat', 'Maize (corn)', 'Rye', 'Barley', 'Oats', 'Sorghum', 'Rice', 'Buckwheat', 'Millet', 'Quinoa', 'Cereals n.e.c.'] 
-    items = ['Wheat', 'Maize (corn)', 'Rye', 'Barley', 'Oats', 'Sorghum', 
-             'Rice, paddy (rice milled equivalent)', 'Buckwheat', 
-             'Millet', 'Quinoa', 'Cereals n.e.c.']
-    years = [2017, 2018, 2019, 2020, 2021]
+    items = [
+        'Wheat', 'Maize (corn)', 'Rye', 'Barley', 'Oats', 'Sorghum', 
+        'Rice, paddy (rice milled equivalent)', 'Buckwheat', 
+        'Millet', 'Quinoa', 'Cereals n.e.c.',
+        'Canary seed', 'Fonio', 'Mixed grain', 'Triticale'
+    ]
+    # years = [2017, 2018, 2019, 2020, 2021]
+    years = [2011, 2012] # for including state level data in India
     
     FAO_area_codes = get_area_codes()
     

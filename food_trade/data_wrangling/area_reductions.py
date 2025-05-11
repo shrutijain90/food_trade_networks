@@ -37,8 +37,6 @@ if __name__ == '__main__':
     admin = ee.FeatureCollection("users/shruti_jain90/admin_polygons_simplified")
     
     #gaez areas
-    banana_area_gaez = ee.Image("users/shruti_jain90/food/gaez_2015/area/GAEZAct2015_HarvArea_Banana_Total")
-    soybean_area_gaez = ee.Image("users/shruti_jain90/food/gaez_2015/area/GAEZAct2015_HarvArea_Soybean_Total")
     barley_area_gaez = ee.Image("users/shruti_jain90/food/gaez_2015/area/GAEZAct2015_HarvArea_Barley_Total")
     maize_area_gaez = ee.Image("users/shruti_jain90/food/gaez_2015/area/GAEZAct2015_HarvArea_Maize_Total")
     millet_area_gaez = ee.Image("users/shruti_jain90/food/gaez_2015/area/GAEZAct2015_HarvArea_Millet_Total")
@@ -55,10 +53,6 @@ if __name__ == '__main__':
     sorghum_production_gaez = ee.Image("users/shruti_jain90/food/gaez_2015/production/GAEZAct2015_Production_Sorghum_Total")
     wheat_production_gaez = ee.Image("users/shruti_jain90/food/gaez_2015/production/GAEZAct2015_Production_Wheat_Total")
     other_cereals_production_gaez = ee.Image("users/shruti_jain90/food/gaez_2015/production/GAEZAct2015_Production_Othercereals_Total")
-    
-    # spam areas
-    coffee_a_area_spam = ee.Image("users/shruti_jain90/food/mapspam_2010/spam2010V2r0_global_H_ACOF_A")
-    coffee_r_area_spam = ee.Image("users/shruti_jain90/food/mapspam_2010/spam2010V2r0_global_H_RCOF_A")
     
     # livestock
     buffaloes = ee.Image("users/shruti_jain90/food/livestock_2015/5_Bf_2015_Da")
@@ -89,21 +83,6 @@ if __name__ == '__main__':
     # ghsl area: meter square
     
     # ## areas
-    
-    # # banana
-    # banana_area_gaez = banana_area_gaez.multiply(1000)
-    # banana_area_red = admin.map(lambda feature: reduce_region(banana_area_gaez, feature))
-    # export_features(banana_area_red, 'banana_areas')
-
-    # # soybean
-    # soybean_area_gaez = soybean_area_gaez.multiply(1000)
-    # soybean_area_red = admin.map(lambda feature: reduce_region(soybean_area_gaez, feature))
-    # export_features(soybean_area_red, 'soybean_areas')
-    
-    # # coffee
-    # coffee_area_spam = coffee_a_area_spam.add(coffee_r_area_spam)
-    # coffee_area_red = admin.map(lambda feature: reduce_region(coffee_area_spam, feature))
-    # export_features(coffee_area_red, 'coffee_areas')
     
     # # barley
     # barley_area_gaez = barley_area_gaez.multiply(1000)
