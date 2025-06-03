@@ -330,7 +330,12 @@ def get_bilateral_data(admin_level=True):
     return df_country, df_admin
 
 
-def fit_consumption(master_df_country, df_country, crop, cols, scatter_plot=False):
+def fit_consumption(master_df_country, df_country, crop='cereals_all', cols=None, scatter_plot=False, print_reg=False):
+    
+    if cols is None:
+        cols = ['buffaloes_log', 'cattle_log', 'chickens_log', 
+                'ducks_log', 'goats_log', 'horses_log', #'pigs_log', 'sheep_log', 
+                'pop_log', 'gdp_log', f'{crop}_prod_log']
 
     cons = master_df_country.copy()
     cons['wheat_prod_log'] = np.log(cons['wheat_prod'] + 1)
@@ -361,6 +366,9 @@ def fit_consumption(master_df_country, df_country, crop, cols, scatter_plot=Fals
     
     cons_mod = sm.GLM.from_formula(fml, family=sm.families.Gamma(link=sm.families.links.Log()), data=cons)
     res = cons_mod.fit()
+    
+    if print_reg:
+        print(res.summary(cons_mod))
     
     cons[f'{crop}_cons_pred'] = res.predict(cons[cols])
     
@@ -434,7 +442,7 @@ def pred_consumption(master_df_country, df_country, df_admin, scatter_plot=False
                     'pop_log', 'gdp_log', f'{crop}_prod_log']
 
         print('R2 while fitting')
-        res = fit_consumption(master_df_country, df_country, crop, cols, scatter_plot=scatter_plot)
+        res = fit_consumption(master_df_country, df_country, crop=crop, cols=cols, scatter_plot=scatter_plot, print_reg=False)
     
         cons[f'{crop}_cons'] = res.predict(cons[cols])
     
