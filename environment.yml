@@ -1,0 +1,21 @@
+name: food_trade
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.12
+  - numpy=1.26.4
+  - pandas=2.2.3
+  - matplotlib=3.8.4
+  - seaborn=0.13.2
+  - jupyter=1.1.1
+  - geopandas=1.0.1
+  - shapely=2.0.7
+  - scikit-learn=1.6.1
+  - statsmodels=0.14.4
+  - keras=3.9.0
+  - tensorflow=2.18.0
+  - pip
+  - pip:
+      - scikeras=0.13.0
+      - basemap=1.4.1
