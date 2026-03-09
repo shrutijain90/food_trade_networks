@@ -24,7 +24,7 @@ def get_area_codes():
     
     prod_area_codes = pd.read_csv(f'{data_dir_prefix}FAOSTAT_A-S_E/Production_Crops_Livestock_E_All_Data_(Normalized)/Production_Crops_Livestock_E_AreaCodes.csv',
                                   encoding='latin1')
-    FAO_area_codes = prod_area_codes.rename(columns={'M49 Code' : 'Area Code (M49)'})
+    FAO_area_codes = prod_area_codes.rename(columns={' M49 Code' : 'Area Code (M49)'})
     FAO_area_codes['Area Code (M49)'] = FAO_area_codes.apply(lambda row: int(row['Area Code (M49)'][1:]), axis=1)
     FAO_area_codes = FAO_area_codes.merge(area_codes)
     FAO_area_codes = FAO_area_codes[['Area Code (M49)', 'country', 'iso3']]
