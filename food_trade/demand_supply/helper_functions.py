@@ -143,6 +143,7 @@ def calculate_sensitivity_metrics(df_base, df_test, description="Beta 1.5 vs Bet
     print(f"  Spearman Rank Correlation: {spearman_corr:.4f} (p-val: {p_value:.2e})")
     print(f"  Common Part of Flows (CPF): {cpf:.4f}")
     print(f"  Top 5% Heavy Hitter Overlap: {top_stability * 100:.1f}%")
+    print(f"  R2: {r2_score(merged['flow_base'], merged['flow_test'])}%")
 
     return merged, spearman_corr, cpf
 
@@ -152,11 +153,11 @@ def process_faf_net_flows(admin):
 
     cols_to_keep = [
         'dms_origst', 'dms_destst', 'sctg2', 
-        'tons_2018', 'tons_2019', 'tons_2020', 'tons_2021', 'tons_2022'
+        'tons_2017', 'tons_2018', 'tons_2019', 'tons_2020', 'tons_2021'
     ]
     
     # Read the CSV 
-    faf_raw = pd.read_csv('../../data/other_data/US_FAF_data/FAF5.7.1_State_2018-2024/FAF5.7.1_State_2018-2024.csv', 
+    faf_raw = pd.read_csv('../../data/other_data/US_FAF_data/FAF5.7.1_State/FAF5.7.1_State.csv', 
                           usecols=cols_to_keep, dtype={'sctg2': str}
                          )
     
@@ -164,7 +165,7 @@ def process_faf_net_flows(admin):
     grains_df = faf_raw[faf_raw['sctg2'] == '02'].copy()
     
     # Calculate the 2018-2022 Average Tonnage
-    grains_df['tons'] = grains_df[['tons_2018', 'tons_2019', 'tons_2020', 'tons_2021', 'tons_2022']].mean(axis=1)
+    grains_df['tons'] = grains_df[['tons_2017', 'tons_2018', 'tons_2019', 'tons_2020', 'tons_2021']].mean(axis=1)
     grains_df = grains_df[['dms_origst', 'dms_destst', 'sctg2', 'tons']]
     grains_df['tons'] = grains_df['tons'] * 1000 # thousand tons to tons
     
@@ -201,7 +202,7 @@ def process_faf_net_flows(admin):
     print(f"  Extracted {len(final_net_flows):,} active net subnational links.")
 
     # Map to admin IDs
-    state_dict = pd.read_excel('../../data/other_data/US_FAF_data/FAF5.7.1_State_2018-2024/FAF5_metadata.xlsx', 
+    state_dict = pd.read_excel('../../data/other_data/US_FAF_data/FAF5.7.1_State/FAF5_metadata.xlsx', 
                       sheet_name='State')
     
     state_dict.loc[state_dict['Description']=='Washington DC', 'Description'] = 'District of Columbia'
